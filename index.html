@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeCommute AI | Smart Traffic Safety Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        
+        .safety-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .safety-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(145deg, #e2e8f0, #cbd5e1);
+            position: relative;
+        }
+        
+        .map-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #64748b;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform-origin: 50% 50%;
+        }
+        
+        .route-option {
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .route-option:hover {
+            background-color: #f1f5f9;
+            border-left-color: #3b82f6;
+        }
+        
+        .route-option.selected {
+            background-color: #eff6ff;
+            border-left-color: #3b82f6;
+        }
+        
+        .detection-box {
+            position: absolute;
+            border: 2px solid;
+            border-radius: 4px;
+        }
+        
+        .helmet-detected {
+            border-color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        .no-helmet {
+            border-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        .seatbelt-detected {
+            border-color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        .no-seatbelt {
+            border-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-traffic-light text-2xl"></i>
+                    <span class="text-xl font-bold">SafeCommute AI</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="hover:text-blue-200 transition">Home</a>
+                    <a href="#" class="hover:text-blue-200 transition">Features</a>
+                    <a href="#" class="hover:text-blue-200 transition">Safety</a>
+                    <a href="#" class="hover:text-blue-200 transition">Dashboard</a>
+                    <a href="#" class="hover:text-blue-200 transition">About</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="relative">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="md:hidden">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <button class="hidden md:block bg-white text-blue-600 px-4 py-2 rounded-full font-medium hover:bg-blue-50 transition">
+                        Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Smarter, Safer Commutes with AI</h1>
+                    <p class="text-xl mb-8 text-blue-100">Real-time traffic optimization and safety compliance detection for all road users.</p>
+                    <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                        <button class="bg-white text-blue-600 px-6 py-3 rounded-full font-bold hover:bg-blue-50 transition flex items-center justify-center">
+                            <i class="fab fa-google-play mr-2"></i> Get on Play Store
+                        </button>
+                        <button class="bg-black text-white px-6 py-3 rounded-full font-bold hover:bg-gray-800 transition flex items-center justify-center">
+                            <i class="fab fa-apple mr-2"></i> Download on App Store
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="relative">
+                        <div class="w-72 h-96 bg-white rounded-2xl shadow-2xl overflow-hidden relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 opacity-90"></div>
+                            <div class="absolute inset-0 p-4 flex flex-col">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div class="text-white font-bold">SafeCommute AI</div>
+                                    <div class="text-white">
+                                        <i class="fas fa-battery-three-quarters"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex-1 bg-white rounded-lg overflow-hidden relative">
+                                    <div class="map-placeholder">
+                                        <i class="fas fa-map-marked-alt text-4xl mb-2 text-blue-500"></i>
+                                        <p class="text-sm text-center px-4">Real-time traffic analysis and optimized routing</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 bg-white rounded-lg p-3 shadow">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-medium">Safety Check</div>
+                                            <div class="text-xs text-gray-500">Helmet detection active</div>
+                                        </div>
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold">92%</div>
+                                <div class="text-xs font-medium">Safety Score</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Key Features</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">SafeCommute AI combines advanced AI technologies to make your daily commute safer and more efficient.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="safety-card bg-white p-6 rounded-xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-4">
+                        <i class="fas fa-route text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Smart Routing</h3>
+                    <p class="text-gray-600 mb-4">AI-powered real-time traffic analysis suggests the fastest and safest routes based on current conditions.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="safety-card bg-white p-6 rounded-xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-green-600 mb-4">
+                        <i class="fas fa-helmet-safety text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Helmet Detection</h3>
+                    <p class="text-gray-600 mb-4">Computer vision detects helmet usage for two-wheeler riders and provides real-time alerts.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="safety-card bg-white p-6 rounded-xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mb-4">
+                        <i class="fas fa-user-shield text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Seatbelt Monitoring</h3>
+                    <p class="text-gray-600 mb-4">Detects seatbelt compliance for drivers and passengers, ideal for fleet management.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="safety-card bg-white p-6 rounded-xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 mb-4">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Safety Analytics</h3>
+                    <p class="text-gray-600 mb-4">Comprehensive dashboard with safety compliance metrics and accident risk zone identification.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="safety-card bg-white p-6 rounded-xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center text-red-600 mb-4">
+                        <i class="fas fa-bell text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Real-time Alerts</h3>
+                    <p class="text-gray-600 mb-4">Instant notifications for safety violations, traffic incidents, and alternative route suggestions.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="safety-card bg-white p-6 rounded-xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-4">
+                        <i class="fas fa-trophy text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Rewards System</h3>
+                    <p class="text-gray-600 mb-4">Earn points for safe commuting behavior redeemable with partner stores and services.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row items-center">
+                <div class="lg:w-1/2 mb-10 lg:mb-0 lg:pr-10">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">How It Works</h2>
+                    <p class="text-gray-600 mb-6">SafeCommute AI uses advanced computer vision and machine learning to analyze traffic patterns and detect safety compliance in real-time.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600">
+                                    <span class="font-bold">1</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Route Optimization</h3>
+                                <p class="text-gray-600">Our AI analyzes multiple data sources to suggest the fastest and safest route based on current conditions.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600">
+                                    <span class="font-bold">2</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Safety Detection</h3>
+                                <p class="text-gray-600">Using your device's camera or roadside cameras, we detect helmet and seatbelt usage with 98% accuracy.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-600">
+                                    <span class="font-bold">3</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Real-time Feedback</h3>
+                                <p class="text-gray-600">Get instant alerts and suggestions to improve your safety compliance and route efficiency.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-gray-800">Live Safety Detection</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium">Helmet</button>
+                                <button class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium">Seatbelt</button>
+                            </div>
+                        </div>
+                        
+                        <div class="relative bg-gray-200 rounded-lg overflow-hidden" style="height: 300px;">
+                            <div id="detection-feed" class="absolute inset-0 flex items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1558981806-ec527fa14c08?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Detection feed" class="w-full h-full object-cover">
+                                
+                                <!-- Detection boxes will be added here by JavaScript -->
+                                <div class="detection-box helmet-detected" style="top: 30%; left: 50%; width: 100px; height: 100px;">
+                                    <div class="absolute -top-5 left-0 bg-green-500 text-white text-xs px-2 py-1 rounded">Helmet Detected</div>
+                                </div>
+                                
+                                <div class="detection-box no-helmet" style="top: 60%; left: 30%; width: 100px; height: 100px;">
+                                    <div class="absolute -top-5 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded">No Helmet</div>
+                                </div>
+                            </div>
+                            
+                            <div class="absolute bottom-4 left-0 right-0 flex justify-center">
+                                <button id="toggle-detection" class="px-6 py-2 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition flex items-center">
+                                    <i class="fas fa-play mr-2"></i> Start Detection
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50 p-3 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-2">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-700">
+</html>
